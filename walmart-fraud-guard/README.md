@@ -1289,40 +1289,65 @@ docker compose ps
 
 ## Production Deployment
 
-### Railway Deployment (Backend)
+**Deploy for FREE** to your choice of platform. No credit card required.
 
-#### Step 1: Create Railway Account
+### ⭐ Option 1: Render (Recommended - Easiest)
 
-1. Go to https://railway.app
-2. Sign up with GitHub
-3. Create new project
+**Cost:** $0/month | **Setup:** 5 minutes | **Includes:** All databases
 
-#### Step 2: Connect GitHub Repository
+1. Go to https://render.com → Dashboard
+2. Click "+ New" → "Blueprint"
+3. Enter repo: `https://github.com/variantbyx/WallmartML.git`
+4. Set root directory: `walmart-fraud-guard`
+5. Add secrets: `JWT_SECRET_KEY`, `OPENAI_API_KEY`
+6. Click "Deploy Blueprint"
+7. Done! Auto-deploys from GitHub pushes
 
-1. In Railway dashboard, click "New Project"
-2. Select "Deploy from GitHub repo"
-3. Authorize and select `variantbyx/WallmartML`
-4. Railway auto-detects Dockerfile
+**Result URLs:**
+- Backend: https://walmart-fraud-guard-backend.onrender.com
+- Frontend: https://walmart-fraud-guard-frontend.onrender.com
 
-#### Step 3: Configure Environment Variables
+### 🚀 Option 2: Google Cloud Run
 
-Set in Railway dashboard:
-
-```
-OPENAI_API_KEY=sk-...
-JWT_SECRET_KEY=your-secret
-DATABASE_URL=postgresql://...
-MONGODB_URL=mongodb+srv://...
-REDIS_URL=redis://...
-```
-
-#### Step 4: Deploy
+**Cost:** ~$1-5/month (pay-per-use) | **Setup:** 15 minutes | **Best for:** Scaling
 
 ```bash
-git push origin main
+# Automated deployment
+cd walmart-fraud-guard
+bash deploy-cloud-run.sh
+
+# Then deploy frontend to Vercel (see below)
 ```
 
-Railway auto-deploys. Production URL: `https://walmartguard.up.railway.app`
+**Result URLs:**
+- Backend: https://walmart-fraud-backend.run.app
+- Frontend: Deploy via Vercel (below)
+
+### 🌍 Option 3: Fly.io (Also Free)
+
+**Cost:** $0/month | **Setup:** 10 minutes | **Best for:** Global distribution
+
+```bash
+# Install Fly CLI
+brew install flyctl
+
+# Deploy
+cd walmart-fraud-guard
+flyctl launch
+flyctl secrets set JWT_SECRET_KEY=$(openssl rand -hex 32)
+flyctl deploy
+```
+
+**Result URLs:**
+- Backend: https://walmart-fraud-guard.fly.dev
+- Frontend: Deploy via Vercel (see below)
+
+### 📚 Full Deployment Guides
+
+For detailed step-by-step instructions, see:
+- [QUICK_DEPLOY.md](./QUICK_DEPLOY.md) - 2-minute overview
+- [FREE_DEPLOYMENT_GUIDE.md](./FREE_DEPLOYMENT_GUIDE.md) - Comprehensive guide
+- [PRODUCTION_CHECKLIST.md](./PRODUCTION_CHECKLIST.md) - Pre-deployment checklist
 
 ### Vercel Deployment (Frontend)
 

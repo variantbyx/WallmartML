@@ -1,0 +1,60 @@
+services:
+  - type: web
+    name: walmart-fraud-guard-backend
+    env: python
+    plan: free
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 4
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"
+      - key: PIP_DEFAULT_TIMEOUT
+        value: "100"
+      - key: APP_ENV
+        value: "production"
+      - key: LOG_LEVEL
+        value: "INFO"
+      - key: JWT_SECRET_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: POSTGRES_DSN
+        fromDatabase:
+          name: walmart-fraud-postgres
+          property: connectionString
+      - key: MONGO_URI
+        fromDatabase:
+          name: walmart-fraud-mongo
+          property: connectionString
+      - key: REDIS_URL
+        fromDatabase:
+          name: walmart-fraud-redis
+          property: connectionString
+      - key: CORS_ORIGINS
+        value: "http://localhost:3000,https://walmart-fraud-guard-frontend.vercel.app"
+      - key: MODEL_PATH
+        value: "ml/artifacts/model.pkl"
+      - key: SCALER_PATH
+        value: "ml/artifacts/scaler.pkl"
+
+  - type: web
+    name: walmart-fraud-guard-frontend
+    env: static
+    staticPublishPath: dist
+    buildCommand: cd frontend && npm install && npm run build
+    envVars:
+      - key: VITE_API_URL
+        value: "https://walmart-fraud-guard-backend.onrender.com"
+
+databases:
+  - name: walmart-fraud-postgres
+    databaseName: fraud_db
+    user: fraud_user
+    plan: free
+
+  - name: walmart-fraud-mongo
+    databaseName: fraud_db
+    plan: free
+
+  - name: walmart-fraud-redis
+    plan: free
