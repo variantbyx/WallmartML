@@ -40,6 +40,11 @@ services:
     container_name: walmart-fraud-redis
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
 
   mongo:
     image: mongo:7.0
@@ -48,6 +53,11 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
 
   postgres:
     image: postgres:16-alpine
@@ -60,6 +70,11 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fraud_user"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
 
 volumes:
   mongo_data:
