@@ -23,6 +23,7 @@ Result:
 ```
 
 **Files already prepared:**
+
 - ✅ `render.yaml` - Blueprint configuration
 - ✅ `Dockerfile` - Backend containerized
 - ✅ `frontend/Dockerfile` - Frontend containerized
@@ -50,6 +51,7 @@ Result:
 ```
 
 **Files already prepared:**
+
 - ✅ `deploy-cloud-run.sh` - Automated deployment script
 - ✅ `Dockerfile` - Ready for Cloud Build
 
@@ -82,6 +84,7 @@ Result:
 ```
 
 **Files already prepared:**
+
 - ✅ `fly.toml` - Fly.io configuration
 - ✅ `Dockerfile` - Ready for Fly
 
@@ -89,15 +92,15 @@ Result:
 
 ## 📊 Platform Comparison
 
-| Feature | Render | Cloud Run | Fly.io | Cost |
-|---------|--------|-----------|--------|------|
-| Setup Time | 5 min | 15 min | 10 min | |
-| Free Tier | ✅ Yes | ✅ Yes | ✅ Yes | |
-| Auto-deploy | ✅ Yes | ✅ GitHub | ✅ CLI | |
-| Always-on | ⏱ 15min sleep | ✅ Always | ✅ Always | |
-| Databases | ✅ All included | Separate | Separate | |
-| Global | Regional | Global | 🌍 Global | |
-| **Monthly Cost** | **$0** | **$0-5** | **$0** | |
+| Feature          | Render          | Cloud Run | Fly.io    | Cost |
+| ---------------- | --------------- | --------- | --------- | ---- |
+| Setup Time       | 5 min           | 15 min    | 10 min    |      |
+| Free Tier        | ✅ Yes          | ✅ Yes    | ✅ Yes    |      |
+| Auto-deploy      | ✅ Yes          | ✅ GitHub | ✅ CLI    |      |
+| Always-on        | ⏱ 15min sleep   | ✅ Always | ✅ Always |      |
+| Databases        | ✅ All included | Separate  | Separate  |      |
+| Global           | Regional        | Global    | 🌍 Global |      |
+| **Monthly Cost** | **$0**          | **$0-5**  | **$0**    |      |
 
 ---
 
@@ -125,6 +128,7 @@ Result:
 ## 📚 Detailed Guides
 
 For step-by-step instructions:
+
 - See `FREE_DEPLOYMENT_GUIDE.md` for all options
 - See `PRODUCTION_CHECKLIST.md` for verified checklist
 
@@ -166,6 +170,7 @@ Your repo already has everything configured:
 ## 🚀 Start Now
 
 ### Option A: Render (Recommended)
+
 1. https://render.com/dashboard
 2. Click "+ New" → "Blueprint"
 3. Paste: `https://github.com/variantbyx/WallmartML.git`
@@ -173,6 +178,7 @@ Your repo already has everything configured:
 5. Deploy!
 
 ### Option B: Local Testing First
+
 ```bash
 cd walmart-fraud-guard
 docker-compose up -d

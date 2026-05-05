@@ -1304,6 +1304,7 @@ docker compose ps
 7. Done! Auto-deploys from GitHub pushes
 
 **Result URLs:**
+
 - Backend: https://walmart-fraud-guard-backend.onrender.com
 - Frontend: https://walmart-fraud-guard-frontend.onrender.com
 
@@ -1320,6 +1321,7 @@ bash deploy-cloud-run.sh
 ```
 
 **Result URLs:**
+
 - Backend: https://walmart-fraud-backend.run.app
 - Frontend: Deploy via Vercel (below)
 
@@ -1339,12 +1341,14 @@ flyctl deploy
 ```
 
 **Result URLs:**
+
 - Backend: https://walmart-fraud-guard.fly.dev
 - Frontend: Deploy via Vercel (see below)
 
 ### 📚 Full Deployment Guides
 
 For detailed step-by-step instructions, see:
+
 - [QUICK_DEPLOY.md](./QUICK_DEPLOY.md) - 2-minute overview
 - [FREE_DEPLOYMENT_GUIDE.md](./FREE_DEPLOYMENT_GUIDE.md) - Comprehensive guide
 - [PRODUCTION_CHECKLIST.md](./PRODUCTION_CHECKLIST.md) - Pre-deployment checklist
