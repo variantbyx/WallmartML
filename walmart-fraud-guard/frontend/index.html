@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Walmart Fraud Guard - Real-time Fraud Detection</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Fraud Operations Console</p>
+          <h1>Walmart Fraud Guard</h1>
+          <p class="subtitle">
+            Live risk scoring, analyst review workflow, drift monitoring, and
+            model governance in one control room.
+          </p>
+        </div>
+        <div class="hero-card">
+          <span class="status-dot"></span>
+          <div>
+            <p class="hero-label">API Status</p>
+            <strong id="apiStatus">Loading...</strong>
+          </div>
+        </div>
+      </header>
+
+      <section class="stats-grid" id="summaryGrid"></section>
+
+      <section class="panel split">
+        <div>
+          <div class="section-head">
+            <h2>Drift Watch</h2>
+            <span id="driftSeverity" class="pill">Loading...</span>
+          </div>
+          <div class="metric-line">
+            <div>
+              <p class="metric-title">Drifted Features</p>
+              <strong id="driftCount">0</strong>
+            </div>
+            <div>
+              <p class="metric-title">Retrain Recommendation</p>
+              <strong id="retrainStatus">No</strong>
+            </div>
+          </div>
+          <div id="driftList" class="drift-list"></div>
+        </div>
+
+        <div>
+          <div class="section-head">
+            <h2>Production Model</h2>
+            <span class="pill pill-dark">Governed</span>
+          </div>
+          <div class="model-card">
+            <p class="metric-title">Current Version</p>
+            <strong id="modelVersion">Loading...</strong>
+            <p class="muted" id="modelMetric">Waiting for registry data</p>
+          </div>
+          <div class="model-card subtle">
+            <p class="metric-title">Top Risk Signals</p>
+            <div id="riskDistribution" class="bars"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-head">
+          <h2>Recent Alerts</h2>
+          <span class="pill pill-alert">Live Feed</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Transaction</th>
+                <th>User</th>
+                <th>Risk</th>
+                <th>Score</th>
+                <th>Explanation</th>
+              </tr>
+            </thead>
+            <tbody id="alertRows"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

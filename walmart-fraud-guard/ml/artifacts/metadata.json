@@ -1,0 +1,23 @@
+{
+  "model_version": "xgb-20260504-1926",
+  "trained_at": "2026-05-04T19:26:06.608533+00:00",
+  "feature_columns": [
+    "amount",
+    "account_age_days",
+    "total_orders",
+    "total_returns",
+    "avg_order_value",
+    "avg_return_value",
+    "return_ratio",
+    "arv_aov_ratio",
+    "hour",
+    "is_night"
+  ],
+  "metrics": {
+    "roc_auc": 0.9924677218448423
+  },
+  "artifacts": {
+    "model_path": "C:\\Users\\BIT\\Desktop\\Garbage\\Wallmart ML\\walmart-fraud-guard\\ml\\artifacts\\model.pkl",
+    "scaler_path": "C:\\Users\\BIT\\Desktop\\Garbage\\Wallmart ML\\walmart-fraud-guard\\ml\\artifacts\\scaler.pkl"
+  }
+}
