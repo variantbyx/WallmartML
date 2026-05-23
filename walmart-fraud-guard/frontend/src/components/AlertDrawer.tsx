@@ -1,15 +1,19 @@
 import React, { useState } from "react";
-import { FraudAlert } from "../types";
+import type { RecentAlert } from "../types";
 import { AnalystReview } from "./AnalystReview";
 
 interface AlertDrawerProps {
-  alert: FraudAlert | null;
+  alert: RecentAlert | null;
+  reviewerId: string;
+  busy?: boolean;
   onClose: () => void;
-  onReview: (alert: FraudAlert, flag: boolean, notes: string) => void;
+  onReview: (alert: RecentAlert, flag: boolean, reviewerId: string) => void;
 }
 
 export const AlertDrawer: React.FC<AlertDrawerProps> = ({
   alert,
+  reviewerId,
+  busy = false,
   onClose,
   onReview,
 }) => {
@@ -17,136 +21,137 @@ export const AlertDrawer: React.FC<AlertDrawerProps> = ({
 
   if (!alert) return null;
 
-  const riskColors = {
-    LOW: "text-green-600 bg-green-50",
-    MEDIUM: "text-yellow-600 bg-yellow-50",
-    HIGH: "text-orange-600 bg-orange-50",
-    CRITICAL: "text-red-600 bg-red-50",
+  const riskClasses: Record<RecentAlert["risk_level"], string> = {
+    LOW: "text-emerald-700 bg-emerald-50 border-emerald-200",
+    MEDIUM: "text-amber-700 bg-amber-50 border-amber-200",
+    HIGH: "text-orange-700 bg-orange-50 border-orange-200",
+    CRITICAL: "text-red-700 bg-red-50 border-red-200",
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end">
-      <div className="bg-white w-full max-w-md h-screen max-h-[90vh] shadow-lg rounded-t-lg overflow-y-auto">
-        {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-red-600 to-red-700 text-white p-4 flex justify-between items-center">
-          <h2 className="text-lg font-bold">Fraud Alert</h2>
+    <div className="fixed inset-0 z-50 flex items-end bg-slate-950/60 backdrop-blur-sm">
+      <button
+        type="button"
+        aria-label="Close alert drawer"
+        className="absolute inset-0 cursor-default"
+        onClick={onClose}
+      />
+
+      <div className="relative ml-auto h-screen max-h-[94vh] w-full max-w-xl overflow-y-auto rounded-t-[2rem] bg-white shadow-[0_30px_100px_rgba(15,23,42,0.35)]">
+        <div className="sticky top-0 flex items-center justify-between bg-gradient-to-r from-red-600 to-rose-600 px-5 py-4 text-white">
+          <div>
+            <h2 className="text-lg font-black">Fraud Alert</h2>
+            <p className="text-xs uppercase tracking-[0.2em] text-red-100">
+              Interactive review panel
+            </p>
+          </div>
           <button
             onClick={onClose}
-            className="text-white hover:bg-red-800 rounded p-1 transition"
+            className="rounded-full border border-white/20 px-3 py-1 text-sm font-semibold transition hover:bg-white/10"
           >
             ✕
           </button>
         </div>
 
-        <div className="p-6 space-y-6">
-          {/* Transaction Info */}
-          <div className="border-l-4 border-red-500 pl-4">
-            <p className="text-sm text-gray-600">Account ID</p>
-            <p className="font-mono text-sm">{alert.account_id}</p>
-            <p className="text-sm text-gray-600 mt-2">Amount</p>
-            <p className="text-lg font-bold">${alert.amount.toFixed(2)}</p>
-          </div>
-
-          {/* Risk Score */}
-          <div>
-            <p className="text-sm text-gray-600 mb-2">Risk Score</p>
-            <div className="w-full bg-gray-200 rounded-full h-3">
-              <div
-                className={`h-3 rounded-full transition-all ${
-                  alert.risk_score > 0.9
-                    ? "bg-red-600"
-                    : alert.risk_score > 0.75
-                      ? "bg-orange-500"
-                      : "bg-yellow-500"
-                }`}
-                style={{ width: `${alert.risk_score * 100}%` }}
-              />
+        <div className="space-y-6 p-6">
+          <div className="grid gap-4 rounded-3xl border border-slate-200 bg-slate-50 p-5 sm:grid-cols-2">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                Transaction ID
+              </p>
+              <p className="mt-1 font-mono text-sm text-slate-900">
+                {alert.transaction_id}
+              </p>
+              <p className="mt-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                User ID
+              </p>
+              <p className="mt-1 font-mono text-sm text-slate-900">
+                {alert.user_id}
+              </p>
             </div>
-            <p
-              className={`text-lg font-bold mt-2 ${riskColors[alert.risk_level]}`}
-            >
-              {alert.risk_level} RISK ({(alert.risk_score * 100).toFixed(1)}%)
-            </p>
-          </div>
-
-          {/* SHAP Explanation */}
-          <div>
-            <h3 className="font-semibold mb-3">Feature Attribution (SHAP)</h3>
-            <div className="space-y-3">
-              {Object.entries(alert.explanation.features)
-                .sort(
-                  ([, a], [, b]) =>
-                    parseFloat(b.contribution) - parseFloat(a.contribution),
-                )
-                .slice(0, 3)
-                .map(([feature, data]) => (
-                  <div
-                    key={feature}
-                    className="bg-gray-50 p-3 rounded border border-gray-200"
-                  >
-                    <p className="font-mono text-xs text-gray-500 mb-1">
-                      {feature}
-                    </p>
-                    <p className="text-sm font-semibold">{data.value}</p>
-                    <p
-                      className={`text-xs ${
-                        data.impact === "high"
-                          ? "text-red-600"
-                          : "text-orange-600"
-                      }`}
-                    >
-                      Impact: {data.impact.toUpperCase()} ({data.contribution})
-                    </p>
-                  </div>
-                ))}
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                Risk Score
+              </p>
+              <div className="mt-2 h-3 overflow-hidden rounded-full bg-slate-200">
+                <div
+                  className={`h-3 rounded-full transition-all ${
+                    alert.risk_score > 0.9
+                      ? "bg-red-600"
+                      : alert.risk_score > 0.75
+                        ? "bg-orange-500"
+                        : alert.risk_score > 0.5
+                          ? "bg-amber-400"
+                          : "bg-emerald-500"
+                  }`}
+                  style={{ width: `${Math.min(100, alert.risk_score * 100)}%` }}
+                />
+              </div>
+              <p
+                className={`mt-2 rounded-2xl border px-3 py-2 text-sm font-black ${riskClasses[alert.risk_level]}`}
+              >
+                {alert.risk_level} RISK ({(alert.risk_score * 100).toFixed(1)}%)
+              </p>
+              {typeof alert.amount === "number" ? (
+                <p className="mt-2 text-sm text-slate-600">
+                  Amount: ${alert.amount.toFixed(2)}
+                </p>
+              ) : null}
             </div>
           </div>
 
-          {/* LLM Narrative Explanation */}
-          <div>
-            <h3 className="font-semibold mb-2">Why This Alert?</h3>
-            <p className="text-sm text-gray-700 leading-relaxed bg-blue-50 p-3 rounded border border-blue-200">
-              {alert.explanation.summary}
+          <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+            <h3 className="mb-3 font-semibold text-slate-900">
+              Why this alert fired
+            </h3>
+            <p className="leading-7 text-slate-600">
+              {alert.explanation ||
+                "No explanation captured for this alert yet."}
             </p>
           </div>
 
-          {/* Risk Factors */}
-          <div>
-            <h3 className="font-semibold mb-2">Risk Factors</h3>
-            <ul className="space-y-2">
-              {alert.explanation.risk_factors.map((factor, idx) => (
-                <li key={idx} className="text-sm flex gap-2">
-                  <span className="text-red-500 font-bold">•</span>
-                  <span>{factor}</span>
-                </li>
-              ))}
-            </ul>
+          <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">
+            {alert.is_confirmed_fraud === null ||
+            alert.is_confirmed_fraud === undefined ? (
+              <p>Review status: not yet reviewed.</p>
+            ) : (
+              <p>
+                Reviewed by{" "}
+                <span className="font-semibold text-slate-900">
+                  {alert.reviewer_id || reviewerId}
+                </span>{" "}
+                as{" "}
+                <span className="font-semibold text-slate-900">
+                  {alert.is_confirmed_fraud
+                    ? "CONFIRMED_FRAUD"
+                    : "FALSE_POSITIVE"}
+                </span>
+              </p>
+            )}
           </div>
 
-          {/* Analyst Review Buttons */}
-          {!showReview && (
-            <div className="flex gap-2 pt-4 border-t">
+          {!showReview ? (
+            <div className="flex gap-2 border-t border-slate-200 pt-4">
               <button
                 onClick={() => setShowReview(true)}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition"
+                className="flex-1 rounded-2xl bg-slate-900 px-4 py-3 font-semibold text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
+                disabled={busy}
               >
-                Review
+                {busy ? "Submitting..." : "Review Alert"}
               </button>
               <button
                 onClick={onClose}
-                className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded transition"
+                className="flex-1 rounded-2xl bg-slate-200 px-4 py-3 font-semibold text-slate-800 transition hover:bg-slate-300"
               >
                 Dismiss
               </button>
             </div>
-          )}
-
-          {/* Review Form */}
-          {showReview && (
+          ) : (
             <AnalystReview
               alert={alert}
-              onSubmit={(flag, notes) => {
-                onReview(alert, flag, notes);
+              defaultReviewerId={reviewerId}
+              onSubmit={(flag, submittedReviewerId) => {
+                onReview(alert, flag, submittedReviewerId);
                 setShowReview(false);
               }}
               onCancel={() => setShowReview(false)}

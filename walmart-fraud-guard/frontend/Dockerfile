@@ -7,14 +7,14 @@ WORKDIR /app
 COPY frontend/package*.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm install
 
 # Copy source code
 COPY frontend/src ./src
-COPY frontend/public ./public 2>/dev/null || true
 COPY frontend/index.html ./
 COPY frontend/vite.config.ts ./
 COPY frontend/tsconfig.json ./
+COPY frontend/tsconfig.node.json ./
 COPY frontend/tailwind.config.js ./
 COPY frontend/postcss.config.js ./
 
@@ -28,7 +28,36 @@ FROM nginx:1.27-alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Copy Nginx configuration
-RUN echo 'server { listen 80; location / { root /usr/share/nginx/html; try_files $uri $uri/ /index.html; } }' > /etc/nginx/conf.d/default.conf
+RUN printf '%s\n' \
+    'server {' \
+    '  listen 80;' \
+    '  server_name _;' \
+    '  root /usr/share/nginx/html;' \
+    '  index index.html;' \
+    '' \
+    '  location /api/ {' \
+    '    proxy_pass http://backend:8000/api/;' \
+    '    proxy_set_header Host $host;' \
+    '    proxy_set_header X-Real-IP $remote_addr;' \
+    '    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' \
+    '    proxy_set_header X-Forwarded-Proto $scheme;' \
+    '  }' \
+    '' \
+    '  location /ws/ {' \
+    '    proxy_pass http://backend:8000/ws/;' \
+    '    proxy_http_version 1.1;' \
+    '    proxy_set_header Upgrade $http_upgrade;' \
+    '    proxy_set_header Connection "upgrade";' \
+    '    proxy_set_header Host $host;' \
+    '    proxy_set_header X-Real-IP $remote_addr;' \
+    '    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;' \
+    '    proxy_set_header X-Forwarded-Proto $scheme;' \
+    '  }' \
+    '' \
+    '  location / {' \
+    '    try_files $uri $uri/ /index.html;' \
+    '  }' \
+    '}' > /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 

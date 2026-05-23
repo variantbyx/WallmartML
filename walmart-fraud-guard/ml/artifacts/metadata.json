@@ -1,6 +1,6 @@
 {
-  "model_version": "xgb-20260504-1926",
-  "trained_at": "2026-05-04T19:26:06.608533+00:00",
+  "model_version": "xgb-20260508-1002",
+  "trained_at": "2026-05-08T10:02:45.144501+00:00",
   "feature_columns": [
     "amount",
     "account_age_days",

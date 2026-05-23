@@ -84,3 +84,13 @@ def require_role(required_role: str):
             )
         return user
     return role_checker
+
+
+async def get_current_user_optional(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+) -> TokenPayload | None:
+    """Optional dependency that returns user if token present, else None."""
+    try:
+        return await get_current_user(credentials)
+    except HTTPException:
+        return None

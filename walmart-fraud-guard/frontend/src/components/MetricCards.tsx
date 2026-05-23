@@ -1,22 +1,22 @@
 import React from "react";
-import { Analytics } from "../types";
+import type { AnalyticsSummary } from "../types";
 
 interface MetricCardsProps {
-  analytics: Analytics | null;
+  summary: AnalyticsSummary | null;
   loading: boolean;
 }
 
 export const MetricCards: React.FC<MetricCardsProps> = ({
-  analytics,
+  summary,
   loading,
 }) => {
-  if (loading || !analytics) {
+  if (loading || !summary) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+      <div className="grid gap-4 lg:grid-cols-5">
         {[...Array(5)].map((_, i) => (
           <div
             key={i}
-            className="bg-gray-200 rounded-lg p-4 h-24 animate-pulse"
+            className="h-28 animate-pulse rounded-[1.5rem] border border-white/70 bg-white/70"
           />
         ))}
       </div>
@@ -26,45 +26,49 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
   const cards = [
     {
       label: "Total Transactions",
-      value: analytics.total_transactions,
-      color: "bg-blue-50",
-      textColor: "text-blue-600",
+      value: summary.total_transactions.toLocaleString(),
+      accent: "from-slate-900 to-slate-700",
     },
     {
-      label: "Fraud Count",
-      value: analytics.fraud_count,
-      color: "bg-red-50",
-      textColor: "text-red-600",
+      label: "Total Alerts",
+      value: summary.total_alerts.toLocaleString(),
+      accent: "from-red-600 to-rose-500",
     },
     {
-      label: "Fraud Rate",
-      value: `${(analytics.fraud_rate * 100).toFixed(1)}%`,
-      color: "bg-orange-50",
-      textColor: "text-orange-600",
+      label: "High Risk",
+      value: summary.high_risk_alerts.toLocaleString(),
+      accent: "from-orange-500 to-amber-400",
     },
     {
-      label: "High Alerts",
-      value: analytics.high_alerts,
-      color: "bg-yellow-50",
-      textColor: "text-yellow-600",
+      label: "Critical Risk",
+      value: summary.critical_alerts.toLocaleString(),
+      accent: "from-fuchsia-600 to-pink-500",
     },
     {
-      label: "Critical Alerts",
-      value: analytics.critical_alerts,
-      color: "bg-red-100",
-      textColor: "text-red-700",
+      label: "False Positive Rate",
+      value: `${(summary.false_positive_rate * 100).toFixed(1)}%`,
+      accent: "from-emerald-600 to-teal-500",
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-      {cards.map((card, idx) => (
+    <div className="grid gap-4 lg:grid-cols-5">
+      {cards.map((card) => (
         <div
-          key={idx}
-          className={`${card.color} rounded-lg p-4 border border-gray-200`}
+          key={card.label}
+          className={`rounded-[1.75rem] bg-gradient-to-br ${card.accent} p-[1px] shadow-[0_20px_60px_rgba(15,23,42,0.12)]`}
         >
-          <p className="text-sm text-gray-600 mb-2">{card.label}</p>
-          <p className={`text-2xl font-bold ${card.textColor}`}>{card.value}</p>
+          <div className="h-full rounded-[1.7rem] border border-white/60 bg-white/90 p-4 backdrop-blur-xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+              {card.label}
+            </p>
+            <p className="mt-3 text-3xl font-black text-slate-900">
+              {card.value}
+            </p>
+            <p className="mt-2 text-sm text-slate-500">
+              Window: last {summary.window_hours} hours
+            </p>
+          </div>
         </div>
       ))}
     </div>

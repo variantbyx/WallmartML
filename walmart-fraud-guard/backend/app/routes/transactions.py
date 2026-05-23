@@ -1,12 +1,12 @@
 from decimal import Decimal
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Body, Depends, HTTPException, status
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from redis.asyncio import Redis
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.jwt_handler import get_current_user, TokenPayload
+from app.auth.jwt_handler import get_current_user, get_current_user_optional, TokenPayload
 from app.db.mongo import get_mongo_db
 from app.db.postgres import FraudEvent, get_pg_session
 from app.db.redis import get_redis
@@ -23,12 +23,12 @@ router = APIRouter(prefix="/transactions", tags=["transactions"])
 
 @router.post("/analyze", response_model=FraudResult)
 async def analyze_transaction(
-    transaction: TransactionInput,
+    transaction: TransactionInput = Body(..., embed=False),
     detector: FraudDetector = Depends(get_detector),
     mongo_db: AsyncIOMotorDatabase = Depends(get_mongo_db),
     pg_session: AsyncSession = Depends(get_pg_session),
     redis: Redis = Depends(get_redis),
-    user: TokenPayload | None = None,  # Optional JWT - allows unauthenticated in demo mode
+    user: TokenPayload | None = Depends(get_current_user_optional),  # Optional JWT - allows unauthenticated in demo mode
 ) -> FraudResult:
     duplicate = await check_duplicate(redis, transaction.id)
     if duplicate:

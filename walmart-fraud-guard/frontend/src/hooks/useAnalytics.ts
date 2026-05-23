@@ -1,35 +1,52 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { Analytics } from "../types";
+import { useCallback, useEffect, useState } from "react";
+import {
+  getApiErrorMessage,
+  getDriftReport,
+  getModelStatus,
+  getSummary,
+} from "../lib/api";
+import type { AnalyticsSummary, DriftReport, ModelStatus } from "../types";
 
 export function useAnalytics() {
-  const [analytics, setAnalytics] = useState<Analytics | null>(null);
+  const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
+  const [driftReport, setDriftReport] = useState<DriftReport | null>(null);
+  const [modelStatus, setModelStatus] = useState<ModelStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchAnalytics = async () => {
-      try {
-        const response = await axios.get("/api/v1/analytics/summary", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
-        });
-        setAnalytics(response.data);
-        setError(null);
-      } catch (err) {
-        console.error("Failed to fetch analytics:", err);
-        setError("Failed to load analytics");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const refresh = useCallback(async () => {
+    setLoading(true);
 
-    fetchAnalytics();
-    const interval = setInterval(fetchAnalytics, 15000); // poll every 15 seconds
+    try {
+      const token = localStorage.getItem("access_token");
+      const [summaryResponse, driftResponse, modelResponse] = await Promise.all(
+        [getSummary(token), getDriftReport(token), getModelStatus(token)],
+      );
 
-    return () => clearInterval(interval);
+      setSummary(summaryResponse);
+      setDriftReport(driftResponse);
+      setModelStatus(modelResponse);
+      setError(null);
+    } catch (fetchError) {
+      setError(getApiErrorMessage(fetchError));
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  return { analytics, loading, error };
+  useEffect(() => {
+    void refresh();
+    const interval = window.setInterval(() => {
+      void getSummary(localStorage.getItem("access_token"))
+        .then((response) => {
+          setSummary(response);
+          setError(null);
+        })
+        .catch((fetchError) => setError(getApiErrorMessage(fetchError)));
+    }, 15000);
+
+    return () => window.clearInterval(interval);
+  }, [refresh]);
+
+  return { summary, driftReport, modelStatus, loading, error, refresh };
 }

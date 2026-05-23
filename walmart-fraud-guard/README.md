@@ -1153,7 +1153,7 @@ This generates:
 Open browser and navigate to:
 
 ```
-http://localhost:3000
+http://localhost:3001
 ```
 
 Login with default analyst credentials:

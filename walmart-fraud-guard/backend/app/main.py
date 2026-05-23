@@ -45,7 +45,7 @@ app.add_middleware(
 app.include_router(ws_router)
 
 # API routes
-app.include_router(auth_router)
+app.include_router(auth_router, prefix=settings.api_prefix)
 app.include_router(transactions_router, prefix=settings.api_prefix)
 app.include_router(analytics_router, prefix=settings.api_prefix)
 app.include_router(models_router, prefix=settings.api_prefix)

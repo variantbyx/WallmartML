@@ -1,51 +1,61 @@
-import React, { useState } from "react";
-import { FraudAlert } from "../types";
+import { useState, type FC } from "react";
+import type { RecentAlert } from "../types";
 
 interface AnalystReviewProps {
-  alert: FraudAlert;
-  onSubmit: (flag: boolean, notes: string) => void;
+  alert: RecentAlert;
+  defaultReviewerId?: string;
+  onSubmit: (flag: boolean, reviewerId: string) => void;
   onCancel: () => void;
 }
 
-export const AnalystReview: React.FC<AnalystReviewProps> = ({
+export const AnalystReview: FC<AnalystReviewProps> = ({
   alert,
+  defaultReviewerId,
   onSubmit,
   onCancel,
 }) => {
   const [flag, setFlag] = useState<boolean | null>(null);
-  const [notes, setNotes] = useState("");
+  const [reviewerId, setReviewerId] = useState(defaultReviewerId ?? "analyst1");
 
   const handleSubmit = () => {
     if (flag === null) {
-      alert("Please select Fraud or False Positive");
+      window.alert("Please select Fraud or False Positive");
       return;
     }
-    onSubmit(flag, notes);
+    if (!reviewerId.trim()) {
+      window.alert("Please enter a reviewer id");
+      return;
+    }
+    onSubmit(flag, reviewerId.trim());
   };
 
   return (
-    <div className="space-y-4 p-4 bg-blue-50 rounded border border-blue-200">
-      <h3 className="font-semibold">Analyst Review</h3>
+    <div className="space-y-4 rounded-3xl border border-slate-200 bg-slate-50 p-4">
+      <h3 className="font-semibold text-slate-900">Analyst Review</h3>
+      <p className="text-sm text-slate-500">
+        Transaction{" "}
+        <span className="font-mono text-slate-700">{alert.transaction_id}</span>
+      </p>
 
       <div className="space-y-2">
-        <p className="text-sm font-medium">Is this fraud?</p>
+        <p className="text-sm font-medium text-slate-700">Is this fraud?</p>
         <div className="flex gap-2">
           <button
             onClick={() => setFlag(true)}
-            className={`flex-1 py-2 px-3 rounded font-semibold transition ${
+            className={`flex-1 rounded-2xl px-3 py-2 font-semibold transition ${
               flag === true
                 ? "bg-red-600 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                : "bg-white text-slate-700 hover:bg-slate-100"
             }`}
           >
             ✓ Confirmed Fraud
           </button>
           <button
             onClick={() => setFlag(false)}
-            className={`flex-1 py-2 px-3 rounded font-semibold transition ${
+            className={`flex-1 rounded-2xl px-3 py-2 font-semibold transition ${
               flag === false
                 ? "bg-green-600 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                : "bg-white text-slate-700 hover:bg-slate-100"
             }`}
           >
             ✗ False Positive
@@ -54,28 +64,27 @@ export const AnalystReview: React.FC<AnalystReviewProps> = ({
       </div>
 
       <div>
-        <label className="text-sm font-medium mb-2 block">
-          Notes (optional)
+        <label className="mb-2 block text-sm font-medium text-slate-700">
+          Reviewer ID
         </label>
-        <textarea
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          placeholder="Add any additional context..."
-          className="w-full p-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          rows={3}
+        <input
+          value={reviewerId}
+          onChange={(event) => setReviewerId(event.target.value)}
+          placeholder="analyst1"
+          className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-red-500 focus:ring-4 focus:ring-red-100"
         />
       </div>
 
       <div className="flex gap-2">
         <button
           onClick={handleSubmit}
-          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded transition"
+          className="flex-1 rounded-2xl bg-slate-900 px-4 py-2 font-semibold text-white transition hover:bg-black"
         >
           Submit Review
         </button>
         <button
           onClick={onCancel}
-          className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 rounded transition"
+          className="flex-1 rounded-2xl bg-slate-200 px-4 py-2 font-semibold text-slate-800 transition hover:bg-slate-300"
         >
           Cancel
         </button>

@@ -4,7 +4,8 @@ import { User } from "../types";
 interface AuthState {
   user: User | null;
   accessToken: string | null;
-  login: (user: User, token: string) => void;
+  refreshToken: string | null;
+  login: (user: User, token: string, refreshToken?: string) => void;
   logout: () => void;
   isAuthenticated: () => boolean;
   hasRole: (role: string) => boolean;
@@ -15,17 +16,22 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     ? JSON.parse(localStorage.getItem("user")!)
     : null,
   accessToken: localStorage.getItem("access_token"),
+  refreshToken: localStorage.getItem("refresh_token"),
 
-  login: (user: User, token: string) => {
+  login: (user: User, token: string, refreshToken?: string) => {
     localStorage.setItem("user", JSON.stringify(user));
     localStorage.setItem("access_token", token);
-    set({ user, accessToken: token });
+    if (refreshToken) {
+      localStorage.setItem("refresh_token", refreshToken);
+    }
+    set({ user, accessToken: token, refreshToken: refreshToken ?? null });
   },
 
   logout: () => {
     localStorage.removeItem("user");
     localStorage.removeItem("access_token");
-    set({ user: null, accessToken: null });
+    localStorage.removeItem("refresh_token");
+    set({ user: null, accessToken: null, refreshToken: null });
   },
 
   isAuthenticated: () => {
